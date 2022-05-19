@@ -75,8 +75,7 @@ impl Environment for CustomEnvironment {
 
 #[ink::contract(env = crate::CustomEnvironment)]
 mod dapp_staking_extension {
-    use super::CurrentEraErr;
-    use super::EraInfo;
+    use super::{CurrentEraErr, EraInfo};
     /// Defines the storage of our contract.
     ///
     /// Here we store the random seed fetched from the chain.

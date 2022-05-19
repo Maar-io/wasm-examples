@@ -38,29 +38,20 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use frame_support::log::{error, trace};
+use frame_support::traits::Randomness;
 pub use pallet_balances::Call as BalancesCall;
+use pallet_contracts::chain_extension::{
+    ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
+};
 pub use pallet_grandpa::AuthorityId as GrandpaId;
 pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::CurrencyAdapter;
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
-pub use sp_runtime::{Perbill, Permill};
-use frame_support::log::{
-    error,
-    trace,
-};
-use pallet_contracts::chain_extension::{
-    ChainExtension,
-    Environment,
-    Ext,
-    InitState,
-    RetVal,
-    SysConfig,
-    UncheckedFrom,
-};
 use sp_runtime::DispatchError;
-use frame_support::traits::Randomness;
+pub use sp_runtime::{Perbill, Permill};
 
 mod weights;
 
@@ -578,13 +569,9 @@ impl pallet_sudo::Config for Runtime {
 pub struct LocalChainExtension;
 
 impl ChainExtension<Runtime> for LocalChainExtension {
-    fn call<E: Ext>(
-        func_id: u32,
-        env: Environment<E, InitState>,
-    ) -> Result<RetVal, DispatchError>
+    fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
     where
-        <E::T as SysConfig>::AccountId:
-            UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
+        <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         match func_id {
             // RandomnessCollectiveFlip - randon()
@@ -598,9 +585,8 @@ impl ChainExtension<Runtime> for LocalChainExtension {
                     "[ChainExtension]|call|func_id:{:}",
                     func_id
                 );
-                env.write(&random_slice, false, None).map_err(|_| {
-                    DispatchError::Other("ChainExtension failed to call random")
-                })?;
+                env.write(&random_slice, false, None)
+                    .map_err(|_| DispatchError::Other("ChainExtension failed to call random"))?;
             }
 
             //DappsStaking - current_era()
@@ -623,7 +609,8 @@ impl ChainExtension<Runtime> for LocalChainExtension {
             2002 => {
                 let mut env = env.buf_in_buf_out();
                 let arg: u32 = env.read_as()?;
-                let era_info = crate::DappsStaking::general_era_info(&arg);
+                let era_info = crate::DappsStaking::general_era_info(&arg)
+                    .ok_or(DispatchError::Other("general_era_info call failed"))?;
                 let era_info_encoded = era_info.encode();
                 trace!(
                     target: "runtime",
@@ -639,7 +626,7 @@ impl ChainExtension<Runtime> for LocalChainExtension {
 
             _ => {
                 error!("Called an unregistered `func_id`: {:}", func_id);
-                return Err(DispatchError::Other("Unimplemented func_id"))
+                return Err(DispatchError::Other("Unimplemented func_id"));
             }
         }
         Ok(RetVal::Converging(0))
