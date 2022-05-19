@@ -562,7 +562,7 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = FetchRandomExtension;
+    type ChainExtension = LocalChainExtension;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -574,10 +574,10 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
-/// Contract extension for `FetchRandom`
-pub struct FetchRandomExtension;
+/// Contract extension for Astar Local Chain-Extension
+pub struct LocalChainExtension;
 
-impl ChainExtension<Runtime> for FetchRandomExtension {
+impl ChainExtension<Runtime> for LocalChainExtension {
     fn call<E: Ext>(
         func_id: u32,
         env: Environment<E, InitState>,
@@ -587,7 +587,7 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
             UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         match func_id {
-            // RandomnessCollectiveFlip
+            // RandomnessCollectiveFlip - randon()
             1101 => {
                 let mut env = env.buf_in_buf_out();
                 let arg: [u8; 32] = env.read_as()?;
@@ -601,7 +601,7 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
                 env.write(&random_slice, false, None).map_err(|_| {
                     DispatchError::Other("ChainExtension failed to call random")
                 })?;
-            },
+            }
 
             //DappsStaking - current_era()
             2001 => {
@@ -617,7 +617,7 @@ impl ChainExtension<Runtime> for FetchRandomExtension {
                 env.write(&current_era_encoded, false, None).map_err(|_| {
                     DispatchError::Other("ChainExtension failed to call current_era")
                 })?;
-            },
+            }
 
             // DappsStaking - general_era_info()
             2002 => {

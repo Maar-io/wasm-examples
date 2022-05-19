@@ -13,7 +13,7 @@ pub trait DappsStakingExt
     fn read_current_era() -> u32;
 
     #[ink(extension = 2002, returns_result = false)]
-    fn read_era_info(era: u32) -> EraInfo<u128>;
+    fn read_era_info(era: u32) -> EraInfo<<ink_env::DefaultEnvironment as Environment>::Balance>;
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -81,11 +81,7 @@ mod dapp_staking_extension {
     ///
     /// Here we store the random seed fetched from the chain.
     #[ink(storage)]
-    pub struct DappsStakingExtension {
-        /// Stores a single `bool` value on the storage.
-        value: u32,
-        staked: u128
-    }
+    pub struct DappsStakingExtension {}
 
     #[ink(event)]
     pub struct CurrentEraUpdated {
@@ -96,44 +92,26 @@ mod dapp_staking_extension {
     impl DappsStakingExtension {
         /// Constructor that initializes the `bool` value to the given `init_value`.
         #[ink(constructor)]
-        pub fn new(init_value: u32) -> Self {
-            Self { value: init_value, staked: 100}
-        }
-
-        /// Constructor that initializes the `bool` value to `false`.
-        ///
-        /// Constructors may delegate to other constructors.
-        #[ink(constructor)]
-        pub fn default() -> Self {
-            Self::new(Default::default())
+        pub fn new() -> Self {
+            DappsStakingExtension {}
         }
 
         /// Calls current_era() in the pallet-dapps-staking
         #[ink(message)]
-        pub fn read_current_era(&mut self) -> Result<(), CurrentEraErr> {
+        pub fn read_current_era(&self) -> Result<u32, CurrentEraErr> {
             let era = self.env().extension().read_current_era()?;
-            self.value = era;
             ink_env::debug_println!("read_current_era: {:?}", era);
-            // Emit the `CurrentEraUpdated` event when the current_era
-            // is successfully fetched.
             self.env().emit_event(CurrentEraUpdated { new: era });
-            Ok(())
-        }
-
-        /// returns last read current era value.
-        #[ink(message)]
-        pub fn get_current_era(&self) -> u32 {
-            self.value
+            Ok(era)
         }
 
         /// Calls current_era() in the pallet-dapps-staking
         #[ink(message)]
-        pub fn read_era_info(&mut self, era:u32) -> Result<(), CurrentEraErr> {
-
+        pub fn read_era_info(&self, era:u32) -> Result<u128, CurrentEraErr> {
+            ink_env::debug_println!("read_era_info: entered");
             let era_info: EraInfo<Balance> = self.env().extension().read_era_info(era)?;
-            self.staked = era_info.staked;
             ink_env::debug_println!("read_era_info: staked:{:?}", era_info.staked);
-            Ok(())
+            Ok(era_info.staked as u128)
         }
 
     }
