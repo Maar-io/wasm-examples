@@ -609,21 +609,21 @@ impl ChainExtension<Runtime> for LocalChainExtension {
             2002 => {
                 let mut env = env.buf_in_buf_out();
                 let arg: u32 = env.read_as()?;
-                crate::DappsStaking::general_era_info(&arg).ok_or(DispatchError::Other("general_era_info error"))?
-                    .encode();
-                // let era_info = crate::DappsStaking::general_era_info(&arg)
-                //     .ok_or(DispatchError::Other("general_era_info call failed"))?;
-                // let era_info_encoded = era_info.encode();
-                // trace!(
-                //     target: "runtime",
-                //     "[ChainExtension]|call|func_id:{:} era_info_encoded:{:?}, arg:{:?}",
-                //     func_id,
-                //     era_info_encoded,
-                //     arg
-                // );
-                // env.write(&era_info_encoded, false, None).map_err(|_| {
-                //     DispatchError::Other("ChainExtension failed to call general_era_info")
-                // })?;
+                let era_info = DappsStaking::general_era_info(arg)
+                    .ok_or(DispatchError::Other("general_era_info call failed"));
+                sp_std::if_std!{println!("era_info:{:?}", era_info)};
+                let era_info_encoded = era_info.encode();
+                sp_std::if_std!{println!("era_info_encoded:{:?}", era_info_encoded)};
+                trace!(
+                    target: "runtime",
+                    "[ChainExtension]|call|func_id:{:} era_info_encoded:{:?}, arg:{:?}",
+                    func_id,
+                    era_info_encoded,
+                    arg
+                );
+                env.write(&era_info_encoded, false, None).map_err(|_| {
+                    DispatchError::Other("ChainExtension failed to call general_era_info")
+                })?;
             }
 
             _ => {

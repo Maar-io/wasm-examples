@@ -33,6 +33,7 @@ impl From<DSErrorCode> for DSError {
         Self::ErrorCode(error_code)
     }
 }
+
 impl From<scale::Error> for DSError {
     fn from(_: scale::Error) -> Self {
         panic!("encountered unexpected invalid SCALE encoding")
@@ -110,19 +111,22 @@ mod dapp_staking_extension {
             Ok(era)
         }
 
-        /// Calls current_era() in the pallet-dapps-staking
+        /// Calls general_era_info() in the pallet-dapps-staking
         #[ink(message)]
         pub fn read_era_info(&self, era: u32) -> Result<EraInfo<Balance>, DSError> {
             ink_env::debug_println!("read_era_info: entered");
-            self.env().extension().read_era_info(era)
+            // self.env().extension().read_era_info(era)
 
-            // let era_info_result= self.env().extension().read_era_info(era);
-            // let era_info = match era_info_result{
-            //     Ok(info)  => info,
-            //     Err(e) => return Err(e),
-            // };
-            // ink_env::debug_println!("read_era_info: staked:{:?}", era_info.rewards.stakers);
-            // Ok(era_info)
+            let era_info_result: Result<EraInfo<Balance>, _> = self.env().extension().read_era_info(era);
+            let era_info = match era_info_result{
+                Ok(info)  => {
+                    ink_env::debug_println!("era_info_result: received {}", info.rewards.dapps);
+                    info
+                },
+                Err(e) => return Err(e),
+            };
+            ink_env::debug_println!("read_era_info: staked:{:?}", era_info.rewards.stakers);
+            Ok(era_info)
         }
     }
 
