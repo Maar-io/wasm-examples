@@ -4,12 +4,15 @@
 
 ## Resources
 - Astar documentation for WASM contracts
-- Astar examples
 - Swanky development toolkit
-- Openbrush
-- ink! examples
-- ink! documentation
+- [Openbrush](https://github.com/Supercolony-net/openbrush-contracts)
 - List of projects building WASM contracts on Shiden/Astar
+
+## ink!
+- ink! [github repo](https://github.com/paritytech/ink)
+- ink! Intro](https://paritytech.github.io/ink/)
+- ink1 [Official Documentation](https://ink.substrate.io/)
+- ink! [Rust doc](https://paritytech.github.io/ink/ink_lang/)
 
 ## ink! examples
 - Astar examples
@@ -17,25 +20,20 @@
 - Openbrush examples
 
 ## Support
-
 - [Stack Exchange](https://substrate.stackexchange.com/) - The best place for all technical questions.
 - Support for teams building on Astar and Shiden [Builders Program](https://astar.network/builders-program/).
 - [Web3 Foundation Grants](https://web3.foundation/grants) - Funding for ecosystem development.
 
 ## Social
-
 - [Substrate Devs Chat (Telegram)](https://t.me/substratedevs) - Chat with other Substrate developers, also bridged to [matrix](https://matrix.to/#/#substratedevs:matrix.org).
 - [Twitter](https://twitter.com/substrate_io) - Follow us to stay up-to-date.
 
 ## Events
-
 - [Sub0 Developer Conference](https://sub0.parity.io/) - Semiannual, online and in-person for all
   things Substrate.
 - [Substrate Seminar](https://substrate.io/ecosystem/resources/seminar/) - Bi-weekly
   collaborative learning sessions.
 - Wasm conferance
-
-## Blogs
 
 ## Videos
 
