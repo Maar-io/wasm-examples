@@ -5,11 +5,11 @@ authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
 [dependencies]
-ink_primitives = { version = "3.0", default-features = false }
-ink_metadata = { version = "3.0", default-features = false, features = ["derive"], optional = true }
-ink_env = { version = "3.0", default-features = false }
-ink_storage = { version = "3.0", default-features = false }
-ink_lang = { version = "3.0", default-features = false }
+ink_primitives = { version = "3.0.1", default-features = false }
+ink_metadata = { version = "3.0.1", default-features = false, features = ["derive"], optional = true }
+ink_env = { version = "3.0.1", default-features = false }
+ink_storage = { version = "3.0.1", default-features = false }
+ink_lang = { version = "3.0.1", default-features = false }
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2", default-features = false, features = ["derive"], optional = true }
@@ -33,3 +33,21 @@ std = [
     "scale-info/std",
 ]
 ink-as-dependency = []
+
+# the following is needed due to compiler error
+
+# ERROR: Validation of the Wasm failed.
+# ERROR: An unexpected panic function import was found in the contract Wasm.
+# This typically goes back to a known bug in the Rust compiler:
+# https://github.com/rust-lang/rust/issues/78744
+# As a workaround try to insert `overflow-checks = false` into your `Cargo.toml`.
+# This will disable safe math operations, but unfortunately we are currently not
+# aware of a better workaround until the bug in the compiler is fixed.
+# ERROR: An unexpected import function was found in the contract Wasm: _ZN4core9panicking5panic17hef1f7a2f1072fba6E.
+# The only allowed import functions are those starting with one of the following prefixes:
+# seal, memory
+
+[profile.release]
+overflow-checks = false
+[profile.dev]
+overflow-checks = false
