@@ -1,5 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use scale::{Encode, Decode, HasCompact};
 use ink_env::Environment;
 use ink_lang as ink;
 
@@ -51,19 +52,28 @@ impl ink_env::chain_extension::FromStatusCode for DSErrorCode {
 }
 
 /// A record of rewards allocated for stakers and dapps
-#[derive(PartialEq, Eq, Clone, Default, scale::Encode, scale::Decode)]
+#[derive(PartialEq, Debug, Eq, Clone, Default, Encode, Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-pub struct RewardInfo<Balance> {
+pub struct RewardInfo<Balance: HasCompact> {
+    /// Total amount of rewards for stakers in an era
+    #[codec(compact)]
     pub stakers: Balance,
+    /// Total amount of rewards for dapps in an era
+    #[codec(compact)]
     pub dapps: Balance,
 }
 
 /// A record for total rewards and total amount staked for an era
-#[derive(PartialEq, Eq, Clone, Default, scale::Encode, scale::Decode)]
+#[derive(PartialEq, Debug, Eq, Clone, Default, Encode, Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-pub struct EraInfo<Balance> {
+pub struct EraInfo<Balance: HasCompact> {
+    /// Total amount of earned rewards for an era
     pub rewards: RewardInfo<Balance>,
+    /// Total staked amount in an era
+    #[codec(compact)]
     pub staked: Balance,
+    /// Total locked amount in an era
+    #[codec(compact)]
     pub locked: Balance,
 }
 
@@ -115,18 +125,15 @@ mod dapp_staking_extension {
         #[ink(message)]
         pub fn read_era_info(&self, era: u32) -> Result<EraInfo<Balance>, DSError> {
             ink_env::debug_println!("read_era_info: entered");
-            // self.env().extension().read_era_info(era)
+            self.env().extension().read_era_info(era)
 
-            let era_info_result: Result<EraInfo<Balance>, _> = self.env().extension().read_era_info(era);
-            let era_info = match era_info_result{
-                Ok(info)  => {
-                    ink_env::debug_println!("era_info_result: received {}", info.rewards.dapps);
-                    info
-                },
-                Err(e) => return Err(e),
-            };
-            ink_env::debug_println!("read_era_info: staked:{:?}", era_info.rewards.stakers);
-            Ok(era_info)
+            // let era_info_result: Result<EraInfo<Balance>, _> = self.env().extension().read_era_info(era);
+            // let era_info = match era_info_result{
+            //     Ok(info)  => info,
+            //     Err(e) => return Err(e),
+            // };
+            // ink_env::debug_println!("read_era_info: staked:{:?}", era_info.rewards.stakers);
+            // Ok(era_info)
         }
     }
 
