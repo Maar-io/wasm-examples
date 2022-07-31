@@ -8,10 +8,10 @@ use ink_lang as ink;
 pub trait DappsStakingExt {
     type ErrorCode = DSErrorCode;
 
-    #[ink(extension = 2001, returns_result = false)]
+    #[ink(extension = 3401, returns_result = false)]
     fn read_current_era() -> u32;
 
-    #[ink(extension = 2002)]
+    #[ink(extension = 3402)]
     fn read_era_info(
         era: u32,
     ) -> Result<EraInfo<<ink_env::DefaultEnvironment as Environment>::Balance>, DSError>;
