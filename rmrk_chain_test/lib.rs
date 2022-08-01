@@ -104,7 +104,7 @@ mod rmrk_chain_test {
 
         #[ink(message)]
         pub fn create_collection(
-            &self,
+            &mut self,
             metadata: Vec<u8>,
             max: Option<u32>,
             symbol: Vec<u8>,
