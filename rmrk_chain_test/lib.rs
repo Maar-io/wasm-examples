@@ -26,7 +26,7 @@ pub trait RmrkExtension {
         metadata: Vec<u8>,
         max: Option<u32>,
         symbol: Vec<u8>,
-    ) -> Result<u32, RmrkError>;
+    ) -> Result<(), RmrkError>;
 }
 
 #[derive(PartialEq, Eq, Copy, Clone, Encode, Decode, Debug)]
